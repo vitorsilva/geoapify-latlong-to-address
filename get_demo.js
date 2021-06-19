@@ -44,7 +44,7 @@ fs.createReadStream('D:\\ONE DRIVE - PESSOAL\\OneDrive\\Site_Doutoramento\\Fiche
     console.table(urls)
     //for each call get the result
 
-    getStuff(urls[0].ApiUrl);
+    getStuff(urls);
   })
 
 function getApiUrls() {
@@ -68,37 +68,47 @@ function getApiUrls() {
 
 }
 
-function getStuff(url) {
-  https.get(url, (resp) => {
-    let data = '';
-  
-    // A chunk of data has been received.
-    resp.on('data', (chunk) => {
-      data += chunk;
-    });
-  
-    // The whole response has been received. Print out the result.
-    resp.on('end', () => {
-      //console.log(JSON.parse(data).explanation);
-      //console.log(data);
+function getStuff(urls) {
 
-      const new_address = {
-        Address: JSON.parse(data).features[0].properties.road
-      };
-  
-      addresses.push(new_address);
+  urls.forEach(function(url) {
 
-      fs.writeFile("ficheiro.json", data, function (err) {
-        if (err) return console.log(err);
-        console.log('Hello World > helloworld.txt');
+    https.get(url.ApiUrl, (resp) => {
+      let data = '';
+    
+      // A chunk of data has been received.
+      resp.on('data', (chunk) => {
+        data += chunk;
       });
-
-
-//      return data;
-    });
+    
+      // The whole response has been received. Print out the result.
+      resp.on('end', () => {
+        //console.log(JSON.parse(data).explanation);
+        //console.log(data);
   
-  }).on("error", (err) => {
-    console.log("Error: " + err.message);
-    return null;
-  });
+        const new_address = {
+          Address: JSON.parse(data).features[0].properties.address_line1
+        };
+    
+        addresses.push(new_address);
+  
+        fs.writeFile("..\\json\\" + url.SourceFile + ".json", data, function (err) {
+          if (err) {
+            console.log(url.SourceFile + ' - ' + err);
+          }
+          
+        });
+  
+  
+  //      return data;
+      });
+    
+    }).on("error", (err) => {
+      console.log("Error: " + err.message);
+      return null;
+    });
+
+
+  })
+
+
 }    
