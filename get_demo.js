@@ -20,7 +20,6 @@ const fs = require('fs')
 const csv = require('csv-parser');
 
 const files = [];
-const urls = [];
 //const url = "https://api.geoapify.com/v1/geocode/reverse?lat=41.15051389&lon=-8.611091667&api_key=" + process.env.GEOAPIFY_API_KEY;
 
 fs.createReadStream('D:\\ONE DRIVE - PESSOAL\\OneDrive\\Site_Doutoramento\\Ficheiros-Base\\_Fotos AT_APP\\outgps.csv')
@@ -36,30 +35,37 @@ fs.createReadStream('D:\\ONE DRIVE - PESSOAL\\OneDrive\\Site_Doutoramento\\Fiche
     files.push(file)
   })
   .on('end', function () {
-      //console.table(files)
-      // TODO: SAVE users data to another file
-      //console.log(files);
-      
 
-      files.forEach(function(file){
+    urls = [];
 
-        const sourceFile = file.SourceFile;
-        const apiUrl = "https://api.geoapify.com/v1/geocode/reverse?lat=" + file.GPSLatitude + "&lon=" + file.GPSLongitude + "&api_key=" + process.env.GEOAPIFY_API_KEY;
+    urls = getApiUrls();
+    console.table(urls)
+    //for each call get the result
 
-        const f = { 
-            SourceFile: sourceFile,
-            ApiUrl: apiUrl
-         }
+  })
 
-         urls.push(f);
+function getApiUrls() {
+  const local_urls = []; 
 
-        });
+  files.forEach(function (file) {
 
-        console.table(urls)
+    const sourceFile = file.SourceFile;
+    const apiUrl = "https://api.geoapify.com/v1/geocode/reverse?lat=" + file.GPSLatitude + "&lon=" + file.GPSLongitude + "&api_key=" + process.env.GEOAPIFY_API_KEY;
 
-    })
+    const new_url = {
+      SourceFile: sourceFile,
+      ApiUrl: apiUrl
+    };
 
-function getStuff() {
+    local_urls.push(new_url);
+
+  });
+
+  return local_urls;
+
+}
+
+function getStuff(url) {
   https.get(url, (resp) => {
     let data = '';
   
@@ -71,11 +77,13 @@ function getStuff() {
     // The whole response has been received. Print out the result.
     resp.on('end', () => {
       //console.log(JSON.parse(data).explanation);
-      console.log(data);
+      //console.log(data);
+      return data;
     });
   
   }).on("error", (err) => {
     console.log("Error: " + err.message);
+    return null;
   });
 }    
 
