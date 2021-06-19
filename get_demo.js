@@ -20,6 +20,8 @@ const fs = require('fs')
 const csv = require('csv-parser');
 
 const files = [];
+const addresses = [];
+
 //const url = "https://api.geoapify.com/v1/geocode/reverse?lat=41.15051389&lon=-8.611091667&api_key=" + process.env.GEOAPIFY_API_KEY;
 
 fs.createReadStream('D:\\ONE DRIVE - PESSOAL\\OneDrive\\Site_Doutoramento\\Ficheiros-Base\\_Fotos AT_APP\\outgps.csv')
@@ -42,6 +44,7 @@ fs.createReadStream('D:\\ONE DRIVE - PESSOAL\\OneDrive\\Site_Doutoramento\\Fiche
     console.table(urls)
     //for each call get the result
 
+    getStuff(urls[0].ApiUrl);
   })
 
 function getApiUrls() {
@@ -78,7 +81,20 @@ function getStuff(url) {
     resp.on('end', () => {
       //console.log(JSON.parse(data).explanation);
       //console.log(data);
-      return data;
+
+      const new_address = {
+        Address: JSON.parse(data).features[0].properties.road
+      };
+  
+      addresses.push(new_address);
+
+      fs.writeFile("ficheiro.json", data, function (err) {
+        if (err) return console.log(err);
+        console.log('Hello World > helloworld.txt');
+      });
+
+
+//      return data;
     });
   
   }).on("error", (err) => {
@@ -86,4 +102,3 @@ function getStuff(url) {
     return null;
   });
 }    
-
