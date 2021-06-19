@@ -24,7 +24,7 @@ fs.readdir(directoryPath, function (err, files) {
     //listing all files using forEach
     files.forEach(function (file) {
         // Do whatever you want to do with the file
-        console.log(file); 
+        //console.log(file); 
 
         let rawdata = fs.readFileSync('D:\\ONE DRIVE - PESSOAL\\OneDrive\\Site_Doutoramento\\LATLONG_STREET\\json\\' + file);
         let address = JSON.parse(rawdata);
@@ -51,10 +51,29 @@ fs.readdir(directoryPath, function (err, files) {
 
     });
 
-    console.table(All_Addresses);
+    //console.table(All_Addresses);
+    writeToCSVFile(All_Addresses);
 });
 
 //address.features[0].properties.address_line1
 //address.features[0].properties.address_line2
 //address.features[0].properties.formatted
 //address.features[0].properties.street
+function writeToCSVFile(addresses) {
+    const filename = '..\\output-address-info.csv';
+    fs.writeFile(filename, extractAsCSV(addresses), err => {
+      if (err) {
+        console.log('Error writing to csv file', err);
+      } else {
+        console.log(`saved as ${filename}`);
+      }
+    });
+  }
+  
+  function extractAsCSV(addresses) {
+    const header = ["Filename|Address_Line1|Address_Line2|Formatted|Street|Housenumber"];
+    const rows = addresses.map(address =>
+       `${address.Filename}|${address.Address_Line1}|${address.Address_Line2}|${address.Formatted}|${address.Street}|${address.Housenumber}`
+    );
+    return header.concat(rows).join("\n");
+  }
